@@ -32,7 +32,6 @@ public class BeerResource {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public Beer create(@Valid @RequestBody Beer beer) {
-		int test = 5 / 0;
 		return beersRep.save(beer);
 	}
 }
