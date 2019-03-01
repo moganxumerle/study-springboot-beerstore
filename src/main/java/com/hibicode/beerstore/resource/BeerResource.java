@@ -19,19 +19,20 @@ import com.hibicode.beerstore.repository.Beers;
 @RestController
 @RequestMapping("/beers")
 public class BeerResource {
-	
+
 	@Autowired
 	private Beers beersRep;
-	
+
 	@GetMapping
-	public List<Beer> all(){
+	public List<Beer> all() {
 //		return Arrays.asList("Heineken", "Devassa", "Stella Artois");
 		return beersRep.findAll();
 	}
-	
+
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public Beer create(@Valid @RequestBody Beer beer) {
+		int test = 5 / 0;
 		return beersRep.save(beer);
 	}
 }

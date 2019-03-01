@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.ObjectError;
@@ -21,41 +23,42 @@ import com.hibicode.beerstore.error.ErrorResponse.ApiError;
 
 import lombok.RequiredArgsConstructor;
 
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class ApiExceptionHandler {
 
 	private static final String NO_MESSAGEGE_AVAILABLE = "No message available";
 	private static final Logger LOG = LoggerFactory.getLogger(ApiExceptionHandler.class);
-	
+
 	private final MessageSource apiErrorMessageSource;
-	
+
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<ErrorResponse> handleNotValidException(MethodArgumentNotValidException exception, Locale locale){
-		
+	public ResponseEntity<ErrorResponse> handleNotValidException(MethodArgumentNotValidException exception,
+			Locale locale) {
+
 		Stream<ObjectError> errors = exception.getBindingResult().getAllErrors().stream();
-		
-		List<ApiError> apiErrors = errors
-				.map(ObjectError::getDefaultMessage)
-				.map(code -> toApiError(code, locale))
+
+		List<ApiError> apiErrors = errors.map(ObjectError::getDefaultMessage).map(code -> toApiError(code, locale))
 				.collect(toList());
-		
+
 		ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.BAD_REQUEST, apiErrors);
 		return ResponseEntity.badRequest().body(errorResponse);
-		
+
 	}
-	
+
 	@ExceptionHandler(InvalidFormatException.class)
-	public ResponseEntity<ErrorResponse> handleInvalidFormatException(InvalidFormatException exception, Locale locale){
-		
+	public ResponseEntity<ErrorResponse> handleInvalidFormatException(InvalidFormatException exception, Locale locale) {
+
 		final String errorCode = "generic-1";
 		final HttpStatus status = HttpStatus.BAD_REQUEST;
-		final ErrorResponse errorReponse = ErrorResponse.of(status, toApiError(errorCode, locale, exception.getValue()));
-		
-		return ResponseEntity.badRequest().body(errorReponse);		
+		final ErrorResponse errorReponse = ErrorResponse.of(status,
+				toApiError(errorCode, locale, exception.getValue()));
+
+		return ResponseEntity.badRequest().body(errorReponse);
 	}
-	
-	private ApiError toApiError(String code, Locale locale, Object... args) {
+
+	public ApiError toApiError(String code, Locale locale, Object... args) {
 		String message;
 		try {
 			message = apiErrorMessageSource.getMessage(code, args, locale);
@@ -63,7 +66,7 @@ public class ApiExceptionHandler {
 			LOG.error("Could not find any message for {} code under {} locale", code, locale);
 			message = NO_MESSAGEGE_AVAILABLE;
 		}
-		
+
 		return new ApiError(code, message);
 	}
 }
