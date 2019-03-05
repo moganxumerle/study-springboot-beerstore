@@ -58,6 +58,16 @@ public class ApiExceptionHandler {
 		return ResponseEntity.badRequest().body(errorReponse);
 	}
 
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<ErrorResponse> handlerInvalidInternalServerError(Exception exception, Locale locale) {
+
+		final String errorCode = "error-generic";
+		final HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+		final ErrorResponse errorReponse = ErrorResponse.of(status, toApiError(errorCode, locale));
+
+		return ResponseEntity.status(status).body(errorReponse);
+	}
+
 	public ApiError toApiError(String code, Locale locale, Object... args) {
 		String message;
 		try {
