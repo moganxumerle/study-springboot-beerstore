@@ -8,7 +8,7 @@ import com.hibicode.beerstore.service.exception.BeerAlreadyExistException;
 @Service
 public class BeerService {
 	
-	public void save(Beer beer) {
+	public Beer save(final Beer beer) {
 		throw new BeerAlreadyExistException();
 	}
 
