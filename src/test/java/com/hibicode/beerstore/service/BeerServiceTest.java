@@ -26,7 +26,7 @@ public class BeerServiceTest {
 
 	@Before
 	public void setUp() {
-		
+
 		MockitoAnnotations.initMocks(this);
 		beerServ = new BeerService(beersMocked);
 
@@ -60,19 +60,52 @@ public class BeerServiceTest {
 		newBeerInDataBase.setName("Heineken");
 		newBeerInDataBase.setType(BeerType.LARGER);
 		newBeerInDataBase.setVolume(new BigDecimal("350"));
-		
+
 		Beer newBeer = new Beer();
 		newBeer.setName("Heineken");
 		newBeer.setType(BeerType.LARGER);
 		newBeer.setVolume(new BigDecimal("350"));
 
 		when(beersMocked.save(newBeer)).thenReturn(newBeerInDataBase);
-		
+
 		Beer beerSaved = beerServ.save(newBeer);
 
 		assertThat(beerSaved.getId(), equalTo(10L));
 		assertThat(beerSaved.getName(), equalTo("Heineken"));
 		assertThat(beerSaved.getType(), equalTo(BeerType.LARGER));
+
+	}
+
+	@Test
+	public void should_update_beer() {
+
+		final Beer beerInDatabase = new Beer();
+		beerInDatabase.setId(10L);
+		beerInDatabase.setName("Devassa");
+		beerInDatabase.setType(BeerType.PILSEN);
+		beerInDatabase.setVolume(new BigDecimal("300"));
+
+		when(beersMocked.findByNameAndType("Devassa", BeerType.PILSEN)).thenReturn(Optional.of(beerInDatabase));
+
+		final Beer beerToUpdate = new Beer();
+		beerToUpdate.setId(10L);
+		beerToUpdate.setName("Devassa");
+		beerToUpdate.setType(BeerType.PILSEN);
+		beerToUpdate.setVolume(new BigDecimal("200"));
+
+		final Beer beerMocked = new Beer();
+		beerMocked.setId(10L);
+		beerMocked.setName("Devassa");
+		beerMocked.setType(BeerType.PILSEN);
+		beerMocked.setVolume(new BigDecimal("200"));
+
+		when(beersMocked.save(beerToUpdate)).thenReturn(beerMocked);
+
+		final Beer beerUpdated = beerServ.save(beerToUpdate);
+		assertThat(beerUpdated.getId(), equalTo(10L));
+		assertThat(beerUpdated.getName(), equalTo("Devassa"));
+		assertThat(beerUpdated.getType(), equalTo(BeerType.PILSEN));
+		assertThat(beerUpdated.getVolume(), equalTo(new BigDecimal("200")));
 
 	}
 

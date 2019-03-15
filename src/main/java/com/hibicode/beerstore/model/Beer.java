@@ -10,6 +10,8 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -33,5 +35,15 @@ public class Beer {
 	@NotNull(message = "beers-3")
 	@DecimalMin(value = "0", message = "beers-4")
 	private BigDecimal volume;
+	
+	@JsonIgnore
+	public boolean isNew() {
+		return getId() == null;
+	}
+	
+	@JsonIgnore
+	public boolean alreadyExists() {
+		return getId() != null;
+	}
 	
 }

@@ -13,21 +13,32 @@ import com.hibicode.beerstore.service.exception.BeerAlreadyExistException;
 public class BeerService {
 
 	private Beers beers;
-	
+
 	public BeerService(@Autowired Beers beers) {
 		this.beers = beers;
 	}
 
 	public Beer save(final Beer beer) {
 
-		Optional<Beer> beerByNameAndType = beers.findByNameAndType(beer.getName(), beer.getType());
-
-		if (beerByNameAndType.isPresent()) {
-			throw new BeerAlreadyExistException();
-		}
-
+		verifyIfBeerExists(beer);
 		return beers.save(beer);
 
+	}
+	
+	private void verifyIfBeerExists(final Beer beer) {
+		
+		Optional<Beer> beerByNameAndType = beers.findByNameAndType(beer.getName(), beer.getType());
+		
+		if (beerByNameAndType.isPresent() && (beer.isNew() || isUpdatingToDifferentBeer(beer, beerByNameAndType))) {
+			throw new BeerAlreadyExistException();
+		}
+		
+	}
+	
+	private boolean isUpdatingToDifferentBeer(Beer beer, Optional<Beer> beerByNameAnType) {
+		
+		return beer.alreadyExists() && !beerByNameAnType.get().equals(beer);
+		
 	}
 
 }
