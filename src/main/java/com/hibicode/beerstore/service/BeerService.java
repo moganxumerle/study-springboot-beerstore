@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.hibicode.beerstore.model.Beer;
 import com.hibicode.beerstore.repository.Beers;
 import com.hibicode.beerstore.service.exception.BeerAlreadyExistException;
+import com.hibicode.beerstore.service.exception.BeerNotFoundException;
 
 @Service
 public class BeerService {
@@ -23,6 +24,17 @@ public class BeerService {
 		verifyIfBeerExists(beer);
 		return beers.save(beer);
 
+	}
+	
+	public void delete(final Long id) {
+		
+		Optional<Beer> optBeer = beers.findById(id);
+		
+		if (!optBeer.isPresent()) {
+			throw new BeerNotFoundException();
+		}
+		
+		beers.delete(optBeer.get());
 	}
 	
 	private void verifyIfBeerExists(final Beer beer) {

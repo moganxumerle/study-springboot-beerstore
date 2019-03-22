@@ -16,6 +16,7 @@ import com.hibicode.beerstore.model.Beer;
 import com.hibicode.beerstore.model.BeerType;
 import com.hibicode.beerstore.repository.Beers;
 import com.hibicode.beerstore.service.exception.BeerAlreadyExistException;
+import com.hibicode.beerstore.service.exception.BeerNotFoundException;
 
 public class BeerServiceTest {
 
@@ -127,6 +128,42 @@ public class BeerServiceTest {
 		beerToUpdate.setVolume(new BigDecimal("355"));
 
 		beerServ.save(beerToUpdate);
+	}
+	
+	@Test(expected = BeerNotFoundException.class)
+	public void should_deny_delete_an_beer_that_not_exists() {
+		
+		final Beer beerToDelete = new Beer();
+		beerToDelete.setId(3L);
+		beerToDelete.setName("Heineken");
+		beerToDelete.setType(BeerType.LAGER);
+		beerToDelete.setVolume(new BigDecimal("355"));
+		
+		when(beersMocked.findById(beerToDelete.getId())).thenReturn(Optional.empty());
+		
+		beerServ.delete(beerToDelete.getId());
+		
+	}
+	
+	@Test
+	public void should_delete_an_beer_that_exists() {
+		
+		final Beer beerInDataBase = new Beer();
+		beerInDataBase.setId(77L);
+		beerInDataBase.setName("Heineken");
+		beerInDataBase.setType(BeerType.LAGER);
+		beerInDataBase.setVolume(new BigDecimal("355"));
+		
+		final Beer beerToDelete = new Beer();
+		beerToDelete.setId(77L);
+		beerToDelete.setName("Heineken");
+		beerToDelete.setType(BeerType.LAGER);
+		beerToDelete.setVolume(new BigDecimal("355"));
+		
+		when(beersMocked.findById(beerToDelete.getId())).thenReturn(Optional.of(beerInDataBase));
+		
+		beerServ.delete(77L);
+		
 	}
 
 }

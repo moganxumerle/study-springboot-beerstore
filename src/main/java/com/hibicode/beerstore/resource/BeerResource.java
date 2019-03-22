@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +26,7 @@ public class BeerResource {
 
 	@Autowired
 	private Beers beersRep;
-	
+
 	@Autowired
 	private BeerService beersServ;
 
@@ -40,10 +41,16 @@ public class BeerResource {
 	public Beer create(@Valid @RequestBody Beer beer) {
 		return beersServ.save(beer);
 	}
-	
+
 	@PutMapping("/{id}")
 	public Beer update(@PathVariable Long id, @Valid @RequestBody Beer beer) {
 		beer.setId(id);
 		return beersServ.save(beer);
+	}
+
+	@DeleteMapping("{id}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void delete(@PathVariable Long id) {
+		beersServ.delete(id);
 	}
 }
